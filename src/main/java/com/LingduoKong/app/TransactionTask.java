@@ -8,11 +8,9 @@ import java.util.HashMap;
 public class TransactionTask {
 
     private HashMap<String, String> table;
-    private HashMap<String, Integer> valuesCounterTable;
 
     public TransactionTask() {
         table = new HashMap<>();
-        valuesCounterTable = new HashMap<>();
     }
 
     public void set(String key, String value) {
@@ -33,6 +31,10 @@ public class TransactionTask {
 
     public HashMap<String, String> getTable() {
         return table;
+    }
+
+    public boolean hasKey(String key) {
+        return table.containsKey(key);
     }
 
 }
