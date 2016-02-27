@@ -1,10 +1,10 @@
 package com.LingduoKong.app;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Scanner;
 
 /**
- * Hello world!
  *
  */
 public class App 
@@ -34,7 +34,7 @@ public class App
         commandMap.put(COMMIT, 0);
     }
 
-    public void start() {
+    public void start() throws UnsupportedEncodingException {
         DataControl dataControl = new DataControl();
         Scanner scanner = new Scanner(System.in);
 
@@ -44,12 +44,11 @@ public class App
 
             String input = scanner.nextLine().trim();
 
-            String[] arguments = input.split(" ");
-
-            if (arguments == null || arguments.length == 0) {
-                System.out.println("Illegal input, please try again!");
+            if (input.length() == 0) {
                 continue;
             }
+
+            String[] arguments = input.split(" ");
 
             if (!commandMap.containsKey(arguments[0].toUpperCase())) {
                 System.out.println("No such a commend! Please try again!");
@@ -58,8 +57,8 @@ public class App
 
             String commend = arguments[0].toUpperCase();
 
-            if (arguments.length != commandMap.get(commend)) {
-                System.out.println("Illeal Argument number. Expect "
+            if (arguments.length - 1 != commandMap.get(commend)) {
+                System.out.println("Illegal Argument number. Expect "
                         + commandMap.get(commend) + " arguments");
                 continue;
             }
@@ -72,7 +71,7 @@ public class App
                     keepGetInput = false;
                     break;
                 case GET:
-                    System.out.println(dataControl.get(arguments[1]));
+                    System.out.println("\t" + dataControl.get(arguments[1]));
                     break;
                 case SET:
                     dataControl.set(arguments[1], arguments[2]);
@@ -90,32 +89,8 @@ public class App
                     System.out.println(dataControl.numberEqualsTo(arguments[1]));
                     break;
                 default:
-                    System.out.println("NO such commend: " + commend);
             }
         }
     }
-
-
-//    public static void main( String[] args )
-//    {
-//
-//        DataControl dataControl = new DataControl();
-//        Scanner scanner = new Scanner(System.in);
-//
-//        String commend = null;
-//
-//        while ((commend = scanner.nextLine()).equals("END")) {
-//
-//            String[] arguments = commend.split(" ");
-//
-//            if (arguments == null || arguments.length == 0) {
-//                System.out.println("Illegal input, please try again!");
-//                continue;
-//            }
-//
-//            if (arguments[0].toUpperCase().)
-//
-//
-//        }
 
 }

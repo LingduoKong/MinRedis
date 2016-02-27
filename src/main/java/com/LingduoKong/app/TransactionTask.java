@@ -7,10 +7,12 @@ import java.util.HashMap;
  */
 public class TransactionTask {
 
-    HashMap<String, String> table;
+    private HashMap<String, String> table;
+    private HashMap<String, Integer> valuesCounterTable;
 
     public TransactionTask() {
         table = new HashMap<>();
+        valuesCounterTable = new HashMap<>();
     }
 
     public void set(String key, String value) {
@@ -22,8 +24,15 @@ public class TransactionTask {
     }
 
     public void unSet(String key) {
+        table.put(key, null);
+    }
+
+    public void remove(String key) {
         table.remove(key);
     }
 
+    public HashMap<String, String> getTable() {
+        return table;
+    }
 
 }
