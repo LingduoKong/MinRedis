@@ -1,6 +1,5 @@
 package com.LingduoKong.app;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -9,28 +8,28 @@ import java.util.Map;
  */
 public class DataControl {
 
-    private LinkedList<TransactionTask> transactionQueue;
+    private LinkedList<TransactionTask> transactionStack;
     private TransactionTask permanent;
-    private HashMap<String, Integer> valueCounterTable;
+    private Counter counter;
 
     public DataControl() {
-        transactionQueue = new LinkedList<>();
+        transactionStack = new LinkedList<>();
         permanent = new TransactionTask();
-        valueCounterTable = new HashMap<>();
+        counter = new Counter();
     }
 
     public void beginNewTransaction() {
-        transactionQueue.addLast(new TransactionTask());
+        transactionStack.addLast(new TransactionTask());
     }
 
     public void rollBack() {
-        if (transactionQueue.size() > 0) {
-            TransactionTask curTask = transactionQueue.removeLast();
+        if (!transactionStack.isEmpty()) {
+            TransactionTask curTask = transactionStack.removeLast();
             for (Map.Entry<String, String> entry : curTask.getTable().entrySet()) {
                 if (entry.getValue() == null) {
                     addCounterByKey(entry.getKey());
                 } else {
-                    minusCounterByValue(entry.getValue());
+                    minusCounterByKey(entry.getKey());
                 }
             }
         } else {
@@ -39,8 +38,8 @@ public class DataControl {
     }
 
     public void commit() {
-        while (transactionQueue.size() > 0) {
-            TransactionTask curTask = transactionQueue.removeFirst();
+        while (transactionStack.size() > 0) {
+            TransactionTask curTask = transactionStack.removeFirst();
 
             for (Map.Entry<String, String> entry : curTask.getTable().entrySet()) {
                 String key = entry.getKey();
@@ -56,8 +55,8 @@ public class DataControl {
 
     public String get(String key) {
 
-        for (int i = transactionQueue.size() - 1; i >= 0; i--) {
-            TransactionTask task = transactionQueue.get(i);
+        for (int i = transactionStack.size() - 1; i >= 0; i--) {
+            TransactionTask task = transactionStack.get(i);
             if (task.hasKey(key)) {
                 return task.get(key);
             }
@@ -67,8 +66,8 @@ public class DataControl {
 
     public void set(String key, String value) {
         minusCounterByKey(key);
-        if (transactionQueue.size() > 0) {
-            transactionQueue.getLast().set(key, value);
+        if (transactionStack.size() > 0) {
+            transactionStack.getLast().set(key, value);
         } else {
             permanent.set(key, value);
         }
@@ -76,14 +75,14 @@ public class DataControl {
     }
 
     public int numberEqualsTo(String value) {
-        Integer num = valueCounterTable.get(value);
+        Integer num = counter.get(value);
         return num == null ? 0 : num;
     }
 
     public void unset(String key) {
         minusCounterByKey(key);
-        if (transactionQueue.size() > 0) {
-            transactionQueue.getLast().unSet(key);
+        if (transactionStack.size() > 0) {
+            transactionStack.getLast().unSet(key);
         } else {
             permanent.remove(key);
         }
@@ -91,37 +90,11 @@ public class DataControl {
 
     private void addCounterByKey(String key) {
         String value = get(key);
-        addCounterByValue(value);
-    }
-
-    public void addCounterByValue(String value) {
-        if (value == null) {
-            return;
-        }
-        Integer count = valueCounterTable.get(value);
-        if (count == null) {
-            count = 1;
-        } else {
-            count += 1;
-        }
-        valueCounterTable.put(value, count);
+        counter.addCounterByValue(value);
     }
 
     private void minusCounterByKey(String key) {
         String value = get(key);
-        minusCounterByValue(value);
+        counter.minusCounterByValue(value);
     }
-
-    private void minusCounterByValue(String value) {
-        if (value == null) {
-            return;
-        }
-        Integer count = valueCounterTable.get(value);
-        if (count == null || count <= 0) {
-            return;
-        }
-        count -= 1;
-        valueCounterTable.put(value, count);
-    }
-
 }
